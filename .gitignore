@@ -1,0 +1,63 @@
+# -------------------------------
+# OS-specific files
+# -------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+desktop.ini
+
+# -------------------------------
+# IDE/editor files
+# -------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -------------------------------
+# Terraform
+# -------------------------------
+*.tfstate
+*.tfstate.*
+crash.log
+override.tf
+override.tf.json
+terraform.tfvars
+.terraform/
+.terraform.lock.hcl
+
+# -------------------------------
+# Helm
+# -------------------------------
+charts/
+*.tgz
+values-override.yaml
+
+# -------------------------------
+# Kubernetes
+# -------------------------------
+kubeconfig
+.kube/
+*.yaml.tmp
+*.yml.tmp
+
+# -------------------------------
+# Logs
+# -------------------------------
+*.log
+logs/
+tmp/
+*.out
+
+# -------------------------------
+# Docker
+# -------------------------------
+.docker/
+docker-compose.override.yml
+
+# -------------------------------
+# Local registry / cache
+# -------------------------------
+registry/
+.cache/
