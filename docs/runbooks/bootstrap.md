@@ -39,6 +39,9 @@ This step:
 - Installs **cert‑manager** with CRDs
 - Applies **Argo CD install manifest** (`infra/argo-cd-install.yaml`)
 - Creates the **observability namespace**
+- Applies the **Argo CD root App‑of‑Apps manifest** (`argo-apps/root-app.yaml`)
+
+> ⚡️ Note: The root App‑of‑Apps manifest is applied automatically by Terraform. No manual `kubectl apply` is required.
 
 ### 4. Verify cluster status
 ```bash
@@ -62,20 +65,9 @@ kubectl get svc -n argocd
   ```bash
   kubectl port-forward svc/argocd-server -n argocd 8080:443
   ```
-  Then open: `https://localhost:8080` [(localhost in Bing)](https://www.bing.com/search?q="https%3A%2F%2Flocalhost%3A8080%2F")
+  Then open: `https://localhost:8080`
 
-### 6. Sync App‑of‑Apps root manifest
-```bash
-kubectl apply -f ../../argo-apps/root-app.yaml
-```
-
-This deploys:
-- Demo app (instrumented with OpenTelemetry)
-- Grafana Alloy collector
-- LGTM stack (Loki, Grafana, Tempo, Mimir)
-- SLOs and Alertmanager
-
-### 7. Validate Observability Stack
+### 6. Validate Observability Stack
 ```bash
 kubectl get pods -n observability
 ```
@@ -105,3 +97,4 @@ Terraform provides key outputs:
 
 ---
 
+This runbook ensures a **repeatable bootstrap process** for the observability platform, with Argo CD taking over GitOps orchestration automatically.

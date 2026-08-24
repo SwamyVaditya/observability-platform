@@ -74,6 +74,17 @@ resource "kubernetes_manifest" "argocd_install" {
 }
 
 # -------------------------------
+# Argo CD Root App-of-Apps
+# -------------------------------
+resource "kubernetes_manifest" "argocd_root_app" {
+  manifest = yamldecode(file("${path.module}/../argo-apps/root-app.yaml"))
+  depends_on = [
+    kubernetes_manifest.argocd_install
+  ]
+}
+
+
+# -------------------------------
 # Namespaces
 # -------------------------------
 resource "kubernetes_namespace" "observability" {

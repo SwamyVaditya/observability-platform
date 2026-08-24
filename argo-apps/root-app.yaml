@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: observability-root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/your-org/observability-platform'
+    targetRevision: main
+    path: argo-apps
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+  # Child apps orchestrated via App-of-Apps
+  sources:
+    - repoURL: 'https://github.com/your-org/observability-platform'
+      targetRevision: main
+      path: argo-apps/grafana-app.yaml
+    - repoURL: 'https://github.com/your-org/observability-platform'
+      targetRevision: main
+      path: argo-apps/mimir-app.yaml
+    - repoURL: 'https://github.com/your-org/observability-platform'
+      targetRevision: main
+      path: argo-apps/loki-app.yaml
+    - repoURL: 'https://github.com/your-org/observability-platform'
+      targetRevision: main
+      path: argo-apps/tempo-app.yaml
+    - repoURL: 'https://github.com/your-org/observability-platform'
+      targetRevision: main
+      path: argo-apps/alloy-app.yaml
+    - repoURL: 'https://github.com/your-org/observability-platform'
+      targetRevision: main
+      path: argo-apps/demo-app.yaml
+    - repoURL: 'https://github.com/your-org/observability-platform'
+      targetRevision: main
+      path: argo-apps/slo-app.yaml
