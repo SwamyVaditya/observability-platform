@@ -2,13 +2,6 @@
 
 This repository contains a **production‑grade observability platform** built using the **App‑of‑Apps pattern with Argo CD**. It integrates the **LGTM stack (Loki, Grafana, Tempo, Mimir)** with modern CNCF components, hardened for scale, reliability, and resume storytelling.
 
-Designed for **multi-cluster Kubernetes environments**, this repo demonstrates platform engineering best practices in **Monitoring, Observability, GitOps, and SRE**.
-
-`https://img.shields.io/badge/CI-passing-brightgreen`  
-`https://img.shields.io/badge/Terraform-v1.8+-blue`  
-`https://img.shields.io/badge/Helm-v3.12+-blue`  
-`https://img.shields.io/badge/GitOps-ArgoCD-orange`  
-
 ---
 
 ## 📖 Repository Description
@@ -19,8 +12,6 @@ The `observability-platform` repo demonstrates **platform engineering maturity**
 - **SLOs as Code**: Availability and latency objectives defined via Sloth/Pyrra.
 - **Production hardening**: Resource limits, persistence, PodDisruptionBudgets, NetworkPolicies.
 - **Resume differentiation**: Modern CNCF adoption (Mimir, Tempo, Alloy) beyond vanilla Prometheus.
-
-This repo is designed to look like a **platform team deliverable**, not a tutorial — complete with ADRs, runbooks, architecture docs, and interview prep notes.
 
 ---
 
