@@ -93,3 +93,12 @@ This repo is tuned for local clusters with **8 GB RAM and ~20 GB disk**:
 - **Production hardening**: PVCs, PodDisruptionBudgets, NetworkPolicies included.  
 
 ---
+
+## 📈 Next Steps
+
+For detailed bootstrap, troubleshooting, validation, teardown, and extension guidance, see the full runbook:
+
+➡️ [docs/runbooks/bootstrap.md](docs/runbooks/bootstrap.md)
+
+This runbook covers the complete lifecycle of the observability stack, including common pitfalls, success criteria, and future extensions.
+
