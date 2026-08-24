@@ -73,6 +73,7 @@ sequenceDiagram
     Alloy->>Tempo: Forward traces
     Alloy->>Loki: Forward logs
     Alloy->>Mimir: Forward metrics
+```
 
 ---
 
@@ -119,7 +120,7 @@ flowchart TD
 
     Mimir --> SLOs --> Alertmanager
     Alertmanager --> Grafana
-
+```
 
 ---
 
