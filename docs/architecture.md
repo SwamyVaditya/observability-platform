@@ -82,28 +82,28 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     subgraph DemoApp["Demo App Microservices"]
-        FE[Frontend (Node.js)]
-        BO[Backend Orders (FastAPI)]
-        BU[Backend Users (FastAPI)]
+        FE["Frontend (Node.js)"]
+        BO["Backend Orders (FastAPI)"]
+        BU["Backend Users (FastAPI)"]
     end
 
     subgraph Alloy["Grafana Alloy Collector"]
-        OTLP[OTLP Receiver]
-        PromScrape[Prometheus Scraper]
-        LokiClient[Loki Client]
-        TempoClient[Tempo Client]
-        MimirClient[Mimir Remote Write]
+        OTLP["OTLP Receiver"]
+        PromScrape["Prometheus Scraper"]
+        LokiClient["Loki Client"]
+        TempoClient["Tempo Client"]
+        MimirClient["Mimir Remote Write"]
     end
 
     subgraph LGTM["LGTM Stack"]
-        Loki[(Loki — Logs)]
-        Tempo[(Tempo — Traces)]
-        Mimir[(Mimir — Metrics)]
+        Loki["Loki — Logs"]
+        Tempo["Tempo — Traces"]
+        Mimir["Mimir — Metrics"]
     end
 
-    Grafana[(Grafana Dashboards)]
-    Alertmanager[(Alertmanager)]
-    SLOs[(Sloth/Pyrra SLOs)]
+    Grafana["Grafana Dashboards"]
+    Alertmanager["Alertmanager"]
+    SLOs["Sloth/Pyrra SLOs"]
 
     FE --> OTLP
     BO --> OTLP
