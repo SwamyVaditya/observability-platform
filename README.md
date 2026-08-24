@@ -26,6 +26,7 @@ This repo is designed to look like a **platform team deliverable**, not a tutori
 
 ## 📂 Repository Structure
 
+```
 observability-platform/
 ├── infra/
 │   ├── terraform/
