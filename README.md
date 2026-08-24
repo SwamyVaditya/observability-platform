@@ -1,18 +1,7 @@
-# Observability Platform — LGTM + CNCF
+# Observability Platform — GitOps App‑of‑Apps
 *GitOps‑driven observability with LGTM + CNCF*
 
-This repository contains a **production‑grade observability platform** built using the **App‑of‑Apps pattern with Argo CD**. It integrates the **LGTM stack** (Loki, Grafana, Tempo, Mimir) with modern CNCF components, hardened for scale and reliability.
-
----
-
-## 📖 Repository Description
-
-The `observability-platform` repo demonstrates **platform engineering best practices**:
-- **GitOps orchestration**: Argo CD App‑of‑Apps pattern manages infra and apps declaratively.
-- **Observability stack**: Unified pipelines for metrics, logs, and traces.
-- **SLOs as Code**: Availability and latency objectives defined via Sloth/Pyrra.
-- **Production hardening**: Resource limits, persistence, PodDisruptionBudgets, NetworkPolicies.
-- **Documentation**: Architecture diagrams, ADRs, and runbooks included for clarity and operational readiness.
+This repository demonstrates a **production‑style observability platform** built with Kubernetes, Argo CD, and the LGTM stack (Loki, Grafana, Tempo, Mimir), plus Grafana Alloy, SLOs, and Alertmanager. It uses the **App‑of‑Apps GitOps pattern** to declaratively manage all workloads.
 
 ---
 
@@ -21,79 +10,79 @@ The `observability-platform` repo demonstrates **platform engineering best pract
 ```
 observability-platform/
 ├── infra/
-│   ├── terraform/                # Cluster bootstrap (K3D + Argo CD + NetworkPolicies)
-│   │   ├── main.tf
-│   │   ├── variables.tf
-│   │   └── outputs.tf
-│   └── k3d/
-│       └── cluster.yaml          # Raw K3D cluster definition (servers + agents + CNI)
+│   ├── terraform/              # Terraform bootstrap (K3D, Argo CD, Calico, cert-manager)
+│   └── k3d/                    # K3D cluster config
 │
-├── argo-apps/
-│   └── root-app.yaml             # App-of-Apps root manifest for GitOps orchestration
+├── argo-apps/                  # Argo CD Application CRs (App-of-Apps orchestration)
+│   ├── root-app.yaml           # Root App-of-Apps manifest
+│   ├── grafana-app.yaml        # Grafana child app
+│   ├── mimir-app.yaml          # Mimir child app
+│   ├── loki-app.yaml           # Loki child app
+│   ├── tempo-app.yaml          # Tempo child app
+│   ├── alloy-app.yaml          # Grafana Alloy collector
+│   ├── demo-app.yaml           # Demo microservices app (frontend + backends)
+│   ├── slo-app.yaml            # Sloth/Pyrra SLO definitions
+│   └── alertmanager-app.yaml   # Alertmanager child app
 │
-├── apps/
-│   ├── demo-app/                 # Sample app instrumented with OpenTelemetry SDKs
-│   ├── alloy/                    # Grafana Alloy collector (metrics/logs/traces)
-│   ├── slo/                      # Sloth/Pyrra SLO definitions
-│   └── alertmanager/             # Alertmanager child app manifest
+├── apps/                       # Workload manifests (Helm/Kustomize overlays)
+│   ├── grafana/                # Grafana deployment
+│   ├── mimir/                  # Mimir deployment
+│   ├── loki/                   # Loki deployment
+│   ├── tempo/                  # Tempo deployment
+│   ├── alloy/                  # Grafana Alloy collector
+│   ├── demo-app/               # Demo microservices (Node.js frontend + FastAPI backends)
+│   ├── slo/                    # Sloth/Pyrra SLO YAMLs
+│   └── alertmanager/           # Alertmanager deployment
 │
 ├── docs/
-│   ├── architecture.md           # High-level flow + mermaid diagram + screenshots
-│   ├── adr/
-│   │   └── 001-why-mimir-over-prometheus.md
 │   └── runbooks/
-│       ├── availability.md       # Runbook for availability SLO breach
-│       └── latency.md            # Runbook for latency SLO breach
+│       └── bootstrap.md        # Step-by-step bootstrap runbook
+│
+└── README.md                   # This file
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Bootstrap Flow
 
-1. **Bootstrap cluster with Terraform**:
-   ```bash
-   cd infra/terraform
-   terraform init
-   terraform apply -auto-approve
-   ```
+1. **Terraform apply** provisions:
+   - K3D cluster
+   - Calico + cert-manager
+   - Argo CD install
+   - Root App‑of‑Apps manifest
 
-2. **Verify K3D cluster**:
-   ```bash
-   kubectl get nodes
-   ```
+2. **Argo CD syncs child apps**:
+   - Grafana, Loki, Tempo, Mimir
+   - Grafana Alloy collector
+   - Demo microservices app
+   - SLO definitions (Sloth/Pyrra)
+   - Alertmanager
 
-3. **Check Argo CD installation**:
-   ```bash
-   kubectl get pods -n argocd
-   ```
-
-4. **Sync App‑of‑Apps root manifest**:
-   ```bash
-   kubectl apply -f argo-apps/root-app.yaml
-   ```
+3. **Observability stack ready**:
+   - Metrics, logs, traces unified via Alloy
+   - Dashboards in Grafana
+   - Alerts routed via Alertmanager
+   - SLOs continuously evaluated
 
 ---
 
-## 🔑 Key Features
+## ⚖️ Resource Constraints
 
-- **App-of-Apps orchestration**: GitOps manages infra and apps declaratively.  
-- **Unified collector**: Alloy handles metrics, logs, and traces.  
-- **SLO-driven alerts**: Error budget burn alerts with runbooks.  
-- **NetworkPolicy enforcement**: Calico ensures namespace isolation.  
-- **Documentation**: ADRs, runbooks, and architecture docs included.  
+This repo is tuned for local clusters with **8 GB RAM and ~20 GB disk**:
+
+- PVC sizes downsized (Grafana, Loki, Mimir = 2Gi; Tempo = 1Gi)
+- Resource requests/limits reduced (100m CPU / 256Mi memory typical)
+- Retention policies shortened (logs 7d, traces 3d)
 
 ---
 
-## 📤 Outputs
+## 🧭 Why This Matters
 
-Defined in infra/terraform/outputs.tf
-
-- **kubeconfig_path** — path to kubeconfig (`~/.kube/config`)
-- **cluster_name** — name of the K3D cluster
-- **argocd_namespace** — namespace for Argo CD
-- **argocd_server_url** — internal ClusterIP URL for Argo CD server
-- **observability_namespace** — namespace for observability workloads
-- **helm_chart_versions** — pinned Helm chart versions
+- **GitOps orchestration**: Argo CD declaratively manages all workloads.  
+- **Production-style stack**: Demonstrates Grafana + Loki + Tempo + Mimir + Alloy.  
+- **Realistic demo app**: Node.js frontend + Python FastAPI backends emit real traces/logs.  
+- **SLO-driven alerts**: Error budgets and objectives codified in YAML.  
+- **Recruiter-friendly documentation**: Shows platform engineering best practices.  
 
 ---
 

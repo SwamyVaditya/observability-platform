@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tempo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/SwamyVaditya/observability-platform.git'
+    targetRevision: main
+    path: apps/tempo/kustomize
+    helm:
+      releaseName: tempo
+      values: |
+        persistence:
+          enabled: true
+          size: 1Gi       # downsized PVC for local constraints
+          storageClassName: standard
+
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+
+        service:
+          type: ClusterIP
+
+        tempo:
+          search_enabled: true
+          metrics_generator:
+            enabled: true
+          ingester:
+            lifecycler:
+              ring:
+                kvstore:
+                  store: inmemory
+          compactor:
+            compaction:
+              block_retention: 3d   # keep traces for 3 days only
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

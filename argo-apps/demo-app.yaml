@@ -1,0 +1,57 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/SwamyVaditya/observability-platform.git'
+    targetRevision: main
+    path: apps/demo-app/kustomize
+    helm:
+      releaseName: demo-app
+      values: |
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+
+        services:
+          frontend:
+            image: node:18
+            command: ["node", "src/index.js"]
+            ports:
+              - name: http
+                containerPort: 3000
+          backendOrders:
+            image: python:3.11
+            command: ["uvicorn", "src.orders:app", "--host", "0.0.0.0", "--port", "8081"]
+            ports:
+              - name: http
+                containerPort: 8081
+          backendUsers:
+            image: python:3.11
+            command: ["uvicorn", "src.users:app", "--host", "0.0.0.0", "--port", "8082"]
+            ports:
+              - name: http
+                containerPort: 8082
+
+        otel:
+          enabled: true
+          exporter:
+            otlp:
+              endpoint: http://alloy:4317
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

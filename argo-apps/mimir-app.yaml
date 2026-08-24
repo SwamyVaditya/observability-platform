@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mimir
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/SwamyVaditya/observability-platform.git'
+    targetRevision: main
+    path: apps/mimir/kustomize
+    helm:
+      releaseName: mimir
+      values: |
+        monolithic:
+          enabled: true   # simplified deployment mode
+
+        persistence:
+          enabled: true
+          size: 2Gi       # downsized PVC for local constraints
+          storageClassName: standard
+
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 250m
+            memory: 512Mi
+
+        service:
+          type: ClusterIP
+
+        prometheusAgent:
+          enabled: true
+          remoteWrite:
+            - url: http://mimir:9009/api/v1/push
+
+        runtimeConfig:
+          ingester:
+            exemplar_storage_enabled: true
+
+        ruler:
+          enabled: true
+          alertmanager_url: http://alertmanager:9093
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

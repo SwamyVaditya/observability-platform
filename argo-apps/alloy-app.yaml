@@ -1,0 +1,64 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: alloy
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/SwamyVaditya/observability-platform.git'
+    targetRevision: main
+    path: apps/alloy/kustomize
+    helm:
+      releaseName: alloy
+      values: |
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+
+        service:
+          type: ClusterIP
+
+        collectors:
+          otlp:
+            enabled: true
+            grpc:
+              endpoint: 0.0.0.0:4317
+            http:
+              endpoint: 0.0.0.0:4318
+
+          prometheus:
+            enabled: true
+            scrape_configs:
+              - job_name: demo-app
+                static_configs:
+                  - targets: ['demo-app:8080']
+
+          loki:
+            enabled: true
+            clients:
+              - url: http://loki:3100/loki/api/v1/push
+
+          tempo:
+            enabled: true
+            clients:
+              - url: http://tempo:4317
+
+          mimir:
+            enabled: true
+            remote_write:
+              - url: http://mimir:9009/api/v1/push
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true

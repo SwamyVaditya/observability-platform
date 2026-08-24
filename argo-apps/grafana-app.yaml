@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/SwamyVaditya/observability-platform.git'
+    targetRevision: main
+    path: apps/grafana/kustomize
+    helm:
+      releaseName: grafana
+      values: |
+        persistence:
+          enabled: true
+          size: 2Gi   # downsized PVC for local constraints
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 250m
+            memory: 512Mi
+        service:
+          type: ClusterIP
+        grafana.ini:
+          server:
+            root_url: http://localhost:3000
+          auth:
+            disable_login_form: false
+          alerting:
+            enabled: true
+        dashboards:
+          default:
+            enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: observability
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
